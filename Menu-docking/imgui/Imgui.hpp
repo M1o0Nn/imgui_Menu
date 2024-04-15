@@ -150,8 +150,10 @@ int CreateWnd(HINSTANCE hInst, HWND GamehWnd = nullptr)
 				bMainLoop = false;
 		}if (!bMainLoop) break;
 
+
+		static size_t key = 0;
 		// 菜单窗口控制
-		if (GetAsyncKeyState(VK_INSERT) & 1) {
+		if (GetAsyncKeyState(key) & 1) {
 			bShowMenu = !bShowMenu;
 			Sleep(10);
 		}
@@ -164,7 +166,7 @@ int CreateWnd(HINSTANCE hInst, HWND GamehWnd = nullptr)
 		{
 			// 菜单绘制
 			ImGui::ShowDemoWindow(&bMainLoop);
-			ImGui::HotKeyButton();
+			ImGui::HotKeyButton(&key);
 		}
 
 		ImGui::Render();
