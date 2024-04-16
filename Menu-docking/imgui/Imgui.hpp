@@ -8,8 +8,9 @@
 #include <d3d11.h>
 #pragma comment(lib,"d3d11.lib")
 
-#include "fonts/iconFont.hpp"
-#include "fonts/IconsFontAwesome4.h"
+#include "fonts/msyhFont.hpp"
+#include "fonts/lucideFont.hpp"
+#include "fonts/IconsLucide.h"
 
 inline bool bShowMenu = true;
 inline bool bMainLoop = true;
@@ -134,17 +135,20 @@ int CreateWnd(HINSTANCE hInst, HWND GamehWnd = nullptr)
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 	io.ConfigViewportsNoAutoMerge = true;
-	//io.ConfigViewportsNoTaskBarIcon = true;
-	//icoFont_compressed_data
+	io.Fonts->AddFontFromMemoryCompressedTTF(msyhFont_compressed_data, msyhFont_compressed_size, 18.f, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
 
 	io.Fonts->AddFontDefault();
+	float baseFontSize = 35.0f;
+	float iconFontSize = baseFontSize * 2.0f / 3.0f;
 	ImFontConfig config;
 	config.MergeMode = true;
 	config.PixelSnapH = true;
-	config.OversampleH = 3;
-	config.OversampleV = 3;
-	static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-	ImFont* icon_font = io.Fonts->AddFontFromMemoryCompressedTTF(iconFont_compressed_data, iconFont_compressed_size, 32.f, &config, icon_ranges);
+	config.GlyphMinAdvanceX = iconFontSize;
+	static const ImWchar icon_ranges[] = { ICON_MIN_LC, ICON_MAX_LC, 0 };
+	auto icon_font = io.Fonts->AddFontFromMemoryCompressedTTF(msyhFont_compressed_data, msyhFont_compressed_size, baseFontSize);
+	io.Fonts->AddFontFromMemoryCompressedTTF(lucideFont_compressed_data, lucideFont_compressed_size, iconFontSize, &config, icon_ranges);
+	//static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+	//io.Fonts->AddFontFromMemoryCompressedTTF(iconFont_compressed_data, iconFont_compressed_size, iconFontSize, &config, icon_ranges);
 
 	ImGui::StyleColorsClassic();
 
@@ -180,13 +184,26 @@ int CreateWnd(HINSTANCE hInst, HWND GamehWnd = nullptr)
 			// ≤Àµ•ªÊ÷∆
 			ImGui::ShowDemoWindow(&bMainLoop);
 
-
 			ImGui::Begin("123");
 			ImGui::HotKeyButton(&key);
 			ImGui::PushFont(icon_font);
-			ImGui::Button(ICON_FA_CROSSHAIRS " Aimbot");
-			ImGui::Button(ICON_FA_EYE " Visual");
-			ImGui::Button(ICON_FA_COG " Setting");
+
+			//ImGui::Button("##mybutton", ImVec2(0, 50));
+			ImGui::InvisibleButton("mybutton", ImVec2(200, 50));
+			if (ImGui::IsItemClicked())
+			{
+				// Button was clicked
+				MessageBox(0, 0, 0, 0);
+			}
+			ImGui::SameLine(0,0);
+			ImGui::Text(ICON_LC_CROSSHAIR " Legitbot");
+
+
+			{
+				ImGui::Button(ICON_LC_CROSSHAIR " Legitbot", { 200,50 });
+				ImGui::Button(ICON_LC_EYE " Visual", { 200,50 });
+				ImGui::Button(ICON_LC_SETTINGS " Misc", { 200,50 });
+			}
 			ImGui::PopFont();
 			ImGui::End();
 		}
