@@ -16,6 +16,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{e517b0ee-461a-48d2-b1a4-a63291faf278}</UniqueIdentifier>
     </Filter>
+    <Filter Include="imgui\fonts">
+      <UniqueIdentifier>{e954e9da-b630-4dfe-884b-fdf69f2f3e83}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -70,6 +73,12 @@
     </ClInclude>
     <ClInclude Include="imgui\Imgui.hpp">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\fonts\iconFont.hpp">
+      <Filter>imgui\fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\fonts\IconsFontAwesome4.h">
+      <Filter>imgui\fonts</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

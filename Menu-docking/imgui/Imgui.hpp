@@ -8,6 +8,9 @@
 #include <d3d11.h>
 #pragma comment(lib,"d3d11.lib")
 
+#include "fonts/iconFont.hpp"
+#include "fonts/IconsFontAwesome4.h"
+
 inline bool bShowMenu = true;
 inline bool bMainLoop = true;
 
@@ -132,6 +135,16 @@ int CreateWnd(HINSTANCE hInst, HWND GamehWnd = nullptr)
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 	io.ConfigViewportsNoAutoMerge = true;
 	//io.ConfigViewportsNoTaskBarIcon = true;
+	//icoFont_compressed_data
+
+	io.Fonts->AddFontDefault();
+	ImFontConfig config;
+	config.MergeMode = true;
+	config.PixelSnapH = true;
+	config.OversampleH = 3;
+	config.OversampleV = 3;
+	static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+	ImFont* icon_font = io.Fonts->AddFontFromMemoryCompressedTTF(iconFont_compressed_data, iconFont_compressed_size, 32.f, &config, icon_ranges);
 
 	ImGui::StyleColorsClassic();
 
@@ -166,7 +179,16 @@ int CreateWnd(HINSTANCE hInst, HWND GamehWnd = nullptr)
 		{
 			// ≤Àµ•ªÊ÷∆
 			ImGui::ShowDemoWindow(&bMainLoop);
+
+
+			ImGui::Begin("123");
 			ImGui::HotKeyButton(&key);
+			ImGui::PushFont(icon_font);
+			ImGui::Button(ICON_FA_CROSSHAIRS " Aimbot");
+			ImGui::Button(ICON_FA_EYE " Visual");
+			ImGui::Button(ICON_FA_COG " Setting");
+			ImGui::PopFont();
+			ImGui::End();
 		}
 
 		ImGui::Render();

@@ -144,6 +144,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="imgui\fonts\iconFont.hpp" />
+    <ClInclude Include="imgui\fonts\IconsFontAwesome4.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\Imgui.hpp" />
