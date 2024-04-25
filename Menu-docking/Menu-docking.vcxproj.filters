@@ -74,13 +74,10 @@
     <ClInclude Include="imgui\Imgui.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\fonts\IconsLucide.h">
-      <Filter>imgui\fonts</Filter>
+    <ClInclude Include="imgui\myImgui.hpp">
+      <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\fonts\lucideFont.hpp">
-      <Filter>imgui\fonts</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\fonts\msyhFont.hpp">
+    <ClInclude Include="imgui\fonts\IconFont.hpp">
       <Filter>imgui\fonts</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,19 +1,20 @@
-#pragma once
+Ôªø#pragma once
 #include <string>
 #include <random>
 
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
 #pragma comment(lib,"d3d11.lib")
 
-#include "fonts/msyhFont.hpp"
-#include "fonts/lucideFont.hpp"
-#include "fonts/IconsLucide.h"
+#include "fonts/IconFont.hpp"
 
-inline bool bShowMenu = true;
-inline bool bMainLoop = true;
+#include "myImgui.hpp"
+
+ImFont* icon_font = nullptr;
+ImFont* logo_font = nullptr;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -23,7 +24,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_CLOSE:
-		// ‘⁄’‚¿ÔÃÌº”÷˜œﬂ≥Ãøÿ÷∆
+		// Âú®ËøôÈáåÊ∑ªÂä†‰∏ªÁ∫øÁ®ãÊéßÂà∂
 		break;
 	case WM_SIZE:
 		if (wParam == SIZE_MINIMIZED)
@@ -54,7 +55,103 @@ std::wstring random_wstring_window()
 	return newstr;
 }
 
-int CreateWnd(HINSTANCE hInst, HWND GamehWnd = nullptr)
+void SetStyle()
+{
+	ImVec4* colors = ImGui::GetStyle().Colors;
+	colors[ImGuiCol_Button] = ImVec4(0.09f, 0.09f, 0.09f, 1.00f);
+	colors[ImGuiCol_ButtonHovered] = ImVec4(0.11f, 0.11f, 0.11f, 1.00f);
+	colors[ImGuiCol_ButtonActive] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+
+	colors[ImGuiCol_ChildBg] = ImVec4(0.04f, 0.04f, 0.05f, 1.00f); //ImVec4(0.04f, 0.05f, 0.05f, 1.00f); 
+	
+
+	ImGui::GetStyle().ItemSpacing = { 0.f, 0.f };
+	ImGui::GetStyle().WindowPadding = { 0.f, 0.f };
+
+}
+using namespace ImGui;
+
+void Menu()
+{
+	// ËèúÂçïÁªòÂà∂
+	//ImGui::ShowDemoWindow();
+
+
+
+	static ImVec2 WindSize = ImVec2(700, 600);
+	static const char* LogoTitle = "NEVERLOSE";
+	ImGui::PushFont(logo_font);
+	static auto LogoTextSize = ImGui::CalcTextSize(LogoTitle);
+	static auto LeftWid = LogoTextSize.x + 30;
+	ImGui::PopFont();
+
+	ImGui::SetNextWindowSize(WindSize);
+	ImGui::Begin("main", (bool*)0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
+	{
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.04f, 0.05f, 0.05f, 1.00f));
+		ImGui::BeginChild("Left", { LeftWid,WindSize.y },ImGuiChildFlags_AlwaysAutoResize);
+		ImGui::PopStyleColor();
+		{
+			ImGui::PushFont(logo_font);
+			ImGui::SetCursorPos({ 15.f,20.f });
+			AddLogoTitle(LogoTitle, IM_COL32(0, 255, 255, 100));
+			ImGui::PopFont();
+
+			auto cursorpos = ImGui::GetCursorPos();
+			ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal, 0.f);
+			{
+				AddTabBar(ICON_MOUSE, "Legitbot", IM_COL32(21, 161, 240, 200));
+				AddTabBar(ICON_EARTH, "Visual", IM_COL32(21, 161, 240, 200));
+				AddTabBar(ICON_MISC, "Misc", IM_COL32(21, 161, 240, 200));
+				AddTabBar(ICON_GEAR, "Config", IM_COL32(21, 161, 240, 200));
+				//AddTabBar(ICON_SAVE, "Save", IM_COL32(21, 161, 240, 200));
+			}
+		}
+		ImGui::EndChild();
+
+		ImGui::SetCursorPos({ LeftWid,0 });
+		ImGui::BeginChild("Right", { WindSize.x - LeftWid,WindSize.y });
+		{
+			auto cursorpos = ImGui::GetCursorPos();
+			//ImGui::PushStyleColor(ImGuiColor)
+			ImGui::SetCursorPos({ cursorpos.x + 17.f, cursorpos.y + 12 });
+			AddIconButton(ICON_SAVE, "Save Config", ICON_SAVE " Save Config", IM_COL32(100, 100, 100, 255));
+			//ImGui::Button(ICON_SAVE " Save Config");
+			ImGui::SetCursorPos({ cursorpos.x, cursorpos.y + 50 });
+			ImGui::Separator();
+
+
+
+
+
+
+
+			ImGui::SetCursorPos({ cursorpos.x + 10, cursorpos.y + 60 });
+			myBeginChild("Aimbot",ImVec2(230,300), IM_COL32(0, 255, 255, 100));
+
+			myEndChild();
+
+			ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 60 });
+			myBeginChild("Tigerbot", ImVec2(230, 200), IM_COL32(0, 255, 255, 100));
+
+			myEndChild();
+
+			ImGui::SetCursorPos({ cursorpos.x + 10, cursorpos.y + 370 });
+			myBeginChild("Other", ImVec2(230, 200), IM_COL32(0, 255, 255, 100));
+
+			myEndChild();
+
+			ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 270 });
+			myBeginChild("test", ImVec2(230, 300), IM_COL32(0, 255, 255, 100));
+
+			myEndChild();
+		}
+		ImGui::EndChild();
+	}
+	ImGui::End();
+}
+
+int CreateWnd(HINSTANCE hInst, bool* bEnalbe, HWND hGamehWnd = nullptr)
 {
 	std::wstring WndClass = random_wstring_window();
 	WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr,WndClass.c_str(), nullptr };
@@ -135,28 +232,29 @@ int CreateWnd(HINSTANCE hInst, HWND GamehWnd = nullptr)
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 	io.ConfigViewportsNoAutoMerge = true;
-	io.Fonts->AddFontFromMemoryCompressedTTF(msyhFont_compressed_data, msyhFont_compressed_size, 18.f, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
-
+	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arialbd.ttf", 17.0f);
 	io.Fonts->AddFontDefault();
-	float baseFontSize = 35.0f;
-	float iconFontSize = baseFontSize * 2.0f / 3.0f;
+	logo_font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\ariblk.ttf", 32.0f);
+	io.Fonts->AddFontDefault();
+	float baseFontSize = 17.0f;
+	float iconFontSize = baseFontSize * 2.0f / 1.8f;
 	ImFontConfig config;
 	config.MergeMode = true;
 	config.PixelSnapH = true;
 	config.GlyphMinAdvanceX = iconFontSize;
-	static const ImWchar icon_ranges[] = { ICON_MIN_LC, ICON_MAX_LC, 0 };
-	auto icon_font = io.Fonts->AddFontFromMemoryCompressedTTF(msyhFont_compressed_data, msyhFont_compressed_size, baseFontSize);
-	io.Fonts->AddFontFromMemoryCompressedTTF(lucideFont_compressed_data, lucideFont_compressed_size, iconFontSize, &config, icon_ranges);
-	//static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-	//io.Fonts->AddFontFromMemoryCompressedTTF(iconFont_compressed_data, iconFont_compressed_size, iconFontSize, &config, icon_ranges);
+	static const ImWchar icon_ranges[] = { ICON_MIN, ICON_MAX, 0 };
+	icon_font =  io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arialbd.ttf", baseFontSize);
+	io.Fonts->AddFontFromMemoryCompressedTTF(IconFont_compressed_data, IconFont_compressed_size, iconFontSize, &config, icon_ranges);
 
-	ImGui::StyleColorsClassic();
+	ImGui::StyleColorsDark();
+	SetStyle();
 
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX11_Init(device, device_context);
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	while (bMainLoop)
+	static bool bShowMenu = true;
+	while (*bEnalbe)
 	{
 		MSG msg;
 		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -164,13 +262,13 @@ int CreateWnd(HINSTANCE hInst, HWND GamehWnd = nullptr)
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 			if (msg.message == WM_QUIT)
-				bMainLoop = false;
-		}if (!bMainLoop) break;
+				*bEnalbe = false;
+		}if (!*bEnalbe) break;
 
 
 		static size_t key = 0;
-		// ≤Àµ•¥∞ø⁄øÿ÷∆
-		if (GetAsyncKeyState(key) & 1) {
+		// ËèúÂçïÁ™óÂè£ÊéßÂà∂
+		if (GetAsyncKeyState(key) & 0x1) {
 			bShowMenu = !bShowMenu;
 			Sleep(10);
 		}
@@ -181,31 +279,7 @@ int CreateWnd(HINSTANCE hInst, HWND GamehWnd = nullptr)
 
 		if (bShowMenu)
 		{
-			// ≤Àµ•ªÊ÷∆
-			ImGui::ShowDemoWindow(&bMainLoop);
-
-			ImGui::Begin("123");
-			ImGui::HotKeyButton(&key);
-			ImGui::PushFont(icon_font);
-
-			//ImGui::Button("##mybutton", ImVec2(0, 50));
-			ImGui::InvisibleButton("mybutton", ImVec2(200, 50));
-			if (ImGui::IsItemClicked())
-			{
-				// Button was clicked
-				MessageBox(0, 0, 0, 0);
-			}
-			ImGui::SameLine(0,0);
-			ImGui::Text(ICON_LC_CROSSHAIR " Legitbot");
-
-
-			{
-				ImGui::Button(ICON_LC_CROSSHAIR " Legitbot", { 200,50 });
-				ImGui::Button(ICON_LC_EYE " Visual", { 200,50 });
-				ImGui::Button(ICON_LC_SETTINGS " Misc", { 200,50 });
-			}
-			ImGui::PopFont();
-			ImGui::End();
+			Menu();
 		}
 
 		ImGui::Render();

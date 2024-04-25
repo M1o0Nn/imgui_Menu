@@ -3,6 +3,7 @@
 
 int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow)
 {
-	CreateWnd(hInst);
+	bool enable = true;
+	CreateWnd(hInst, &enable);
 	return 0;
 }
