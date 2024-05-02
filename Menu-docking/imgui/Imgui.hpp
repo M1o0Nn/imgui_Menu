@@ -8,13 +8,18 @@
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
 #pragma comment(lib,"d3d11.lib")
+#include <d3dx11.h>
+#pragma comment(lib,"d3dx11.lib")
 
 #include "fonts/IconFont.hpp"
 
 #include "myImgui.hpp"
 
 ImFont* icon_font = nullptr;
+ImFont* small_font = nullptr;
+ImFont* big_font = nullptr;
 ImFont* logo_font = nullptr;
+ID3D11ShaderResourceView* pTextureView = NULL;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -76,35 +81,31 @@ void Menu()
 	// 菜单绘制
 	//ImGui::ShowDemoWindow();
 
-
-
-	static ImVec2 WindSize = ImVec2(700, 600);
-	static const char* LogoTitle = "NEVERLOSE";
+	static ImVec2 WindSize = ImVec2(679, 600);
+	static const char* LogoTitle = "   CLOUD   ";
 	ImGui::PushFont(logo_font);
 	static auto LogoTextSize = ImGui::CalcTextSize(LogoTitle);
 	static auto LeftWid = LogoTextSize.x + 30;
 	ImGui::PopFont();
+	static bool bIsHitbox = false;
 
 	ImGui::SetNextWindowSize(WindSize);
 	ImGui::Begin("main", (bool*)0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
 	{
+		static int PageIdx = 0;
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.04f, 0.05f, 0.05f, 1.00f));
 		ImGui::BeginChild("Left", { LeftWid,WindSize.y },ImGuiChildFlags_AlwaysAutoResize);
 		ImGui::PopStyleColor();
 		{
 			ImGui::PushFont(logo_font);
 			ImGui::SetCursorPos({ 15.f,20.f });
-			AddLogoTitle(LogoTitle, IM_COL32(0, 255, 255, 100));
+			AddLogoTitle(LogoTitle, IM_COL32(MenuColor[0], MenuColor[1], MenuColor[2], 200));
 			ImGui::PopFont();
 
-			auto cursorpos = ImGui::GetCursorPos();
-			ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal, 0.f);
 			{
-				AddTabBar(ICON_MOUSE, "Legitbot", IM_COL32(21, 161, 240, 200));
-				AddTabBar(ICON_EARTH, "Visual", IM_COL32(21, 161, 240, 200));
-				AddTabBar(ICON_MISC, "Misc", IM_COL32(21, 161, 240, 200));
-				AddTabBar(ICON_GEAR, "Config", IM_COL32(21, 161, 240, 200));
-				//AddTabBar(ICON_SAVE, "Save", IM_COL32(21, 161, 240, 200));
+				const char* PageTitleChar[] = { "Legitbot", "Visual", "Misc", "Config" };
+				const char* PageTitleICon[] = { ICON_MOUSE, ICON_EARTH, ICON_MISC, ICON_GEAR };
+				AddPageTitle(&PageIdx, PageTitleICon, PageTitleChar, IM_ARRAYSIZE(PageTitleChar));
 			}
 		}
 		ImGui::EndChild();
@@ -115,40 +116,103 @@ void Menu()
 			auto cursorpos = ImGui::GetCursorPos();
 			//ImGui::PushStyleColor(ImGuiColor)
 			ImGui::SetCursorPos({ cursorpos.x + 17.f, cursorpos.y + 12 });
-			AddIconButton(ICON_SAVE, "Save Config", ICON_SAVE " Save Config", IM_COL32(100, 100, 100, 255));
+			AddIconButton(ICON_SAVE, "Save Config", ICON_SAVE " Save Config", IM_COL32(100, 100, 100, 255), []() {
+				// 保存参数
+				});
 			//ImGui::Button(ICON_SAVE " Save Config");
 			ImGui::SetCursorPos({ cursorpos.x, cursorpos.y + 50 });
 			ImGui::Separator();
 
-
-
-
-
-
-
 			ImGui::SetCursorPos({ cursorpos.x + 10, cursorpos.y + 60 });
-			myBeginChild("Aimbot",ImVec2(230,300), IM_COL32(0, 255, 255, 100));
+			switch (PageIdx)
+			{
+			case 0:
+			{
+				myBeginChild("Aimbot", ImVec2(230, 300), IM_COL32(109, 193, 20, 0));
+				{
+					static float aa = 15.5;
+					AddSliderFloat("Eitle", &aa, 0, 100, "%.1f");
+					static float col[3]{ .46f, .24f, .87f };
+					AddColorEdit3("Eisible color", col);
+					MenuColor[0] = col[0] * 255.f;
+					MenuColor[1] = col[1] * 255.f;
+					MenuColor[2] = col[2] * 255.f;
+					static bool enable = true;
+					static bool enable1 = false;
+					//ImGui::Checkbox("Enable", &enable);
+					AddCheckBox("Enable", &enable);
+					static int Hitbone = 0;
+					const char* HitBoneIndex[] = { "Head", "Neck", "UpperChest","LowerChest","Stomach","Hip","Auto" };
+					AddCombo("Eitbone", &Hitbone, HitBoneIndex, IM_ARRAYSIZE(HitBoneIndex), 125);
+					AddCheckBox("Enable1", &enable1);
+					static SIZE_T key = 0;
+					ImGui::HotKeyButton(&key, ImVec2(100, 20));
+				}
+				myEndChild();
 
-			myEndChild();
+				ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 60 });
+				myBeginChild("Tigerbot", ImVec2(230, 200), IM_COL32(0, 255, 255, 0));
+				{
+					static float aa = 15.5;
+					AddSliderFloat("Title", &aa, 0, 100);
+				}
+				myEndChild();
 
-			ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 60 });
-			myBeginChild("Tigerbot", ImVec2(230, 200), IM_COL32(0, 255, 255, 100));
+				ImGui::SetCursorPos({ cursorpos.x + 10, cursorpos.y + 370 });
+				myBeginChild("Other", ImVec2(230, 200), IM_COL32(0, 255, 255, 0));
+				{
+					AddCheckBox("Hitboxex", &bIsHitbox);
+				}
+				myEndChild();
 
-			myEndChild();
+				ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 270 });
+				myBeginChild("test", ImVec2(230, 300), IM_COL32(0, 255, 255, 0));
 
-			ImGui::SetCursorPos({ cursorpos.x + 10, cursorpos.y + 370 });
-			myBeginChild("Other", ImVec2(230, 200), IM_COL32(0, 255, 255, 100));
+				myEndChild();
+			}
+			break;
+			case 1:
+			{
 
-			myEndChild();
+			}
+			case 2:
+			{
 
-			ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 270 });
-			myBeginChild("test", ImVec2(230, 300), IM_COL32(0, 255, 255, 100));
+			}
+			case 3:
+			{
 
-			myEndChild();
+			}
+			break;
+			break;
+			break;
+			default:
+				break;
+			}
+			
 		}
 		ImGui::EndChild();
 	}
+	auto mainBeginSize = ImGui::GetWindowPos();
 	ImGui::End();
+
+	static float current_states_hitboxex_x{};
+	current_states_hitboxex_x = Lerp(current_states_hitboxex_x, bIsHitbox ? 340.f : 0.f, 0.1f);
+	ImGui::PushFont(big_font);
+	if (current_states_hitboxex_x > 32.000000001f)
+	{
+		ImGui::SetNextWindowSize(ImVec2(current_states_hitboxex_x, 600.f));
+		ImGui::SetNextWindowPos(ImVec2(mainBeginSize.x + 680, mainBeginSize.y));
+		ImGui::Begin("test", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
+		{
+			const char* HitBoneChar[] = { "Head", "Neck", "UpperChest", "LowerChest", "Stomach", "Hip" };
+			const ImVec2 HitBoneVec2[] = { ImVec2(172.f,100.f), ImVec2(172.f,140.f), ImVec2(172.f,182.f), ImVec2(172.f,222.f), ImVec2(172.f,265.f), ImVec2(172.f,310.f) };
+			static bool HitBoneBool[6] = {  };
+			AddHitBoxex(HitBoneChar, HitBoneVec2, HitBoneBool, IM_ARRAYSIZE(HitBoneChar));
+		}
+		ImGui::End();
+	}
+	ImGui::PopFont();
 }
 
 int CreateWnd(HINSTANCE hInst, bool* bEnalbe, HWND hGamehWnd = nullptr)
@@ -232,10 +296,12 @@ int CreateWnd(HINSTANCE hInst, bool* bEnalbe, HWND hGamehWnd = nullptr)
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 	io.ConfigViewportsNoAutoMerge = true;
-	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arialbd.ttf", 17.0f);
+	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arialbd.ttf", 17.0f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
 	io.Fonts->AddFontDefault();
-	logo_font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\ariblk.ttf", 32.0f);
+
+	logo_font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\ariblk.ttf", 38.0f);
 	io.Fonts->AddFontDefault();
+
 	float baseFontSize = 17.0f;
 	float iconFontSize = baseFontSize * 2.0f / 1.8f;
 	ImFontConfig config;
@@ -243,7 +309,16 @@ int CreateWnd(HINSTANCE hInst, bool* bEnalbe, HWND hGamehWnd = nullptr)
 	config.PixelSnapH = true;
 	config.GlyphMinAdvanceX = iconFontSize;
 	static const ImWchar icon_ranges[] = { ICON_MIN, ICON_MAX, 0 };
-	icon_font =  io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arialbd.ttf", baseFontSize);
+	icon_font =  io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arialbd.ttf", baseFontSize, nullptr, io.Fonts->GetGlyphRangesChineseFull());
+	io.Fonts->AddFontFromMemoryCompressedTTF(IconFont_compressed_data, IconFont_compressed_size, iconFontSize, &config, icon_ranges);	
+
+	io.Fonts->AddFontDefault();
+	small_font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arialbd.ttf", 13.0f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
+
+	io.Fonts->AddFontDefault();
+	baseFontSize = 28.0f;
+	iconFontSize = baseFontSize * 2.0f / 1.8f;
+	big_font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arialbd.ttf", 22.f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
 	io.Fonts->AddFontFromMemoryCompressedTTF(IconFont_compressed_data, IconFont_compressed_size, iconFontSize, &config, icon_ranges);
 
 	ImGui::StyleColorsDark();
@@ -251,6 +326,10 @@ int CreateWnd(HINSTANCE hInst, bool* bEnalbe, HWND hGamehWnd = nullptr)
 
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX11_Init(device, device_context);
+
+	ID3D11Resource* resource;
+	D3DX11CreateTextureFromFile(device, L"test.png", NULL, NULL, &resource, NULL);
+	device->CreateShaderResourceView(resource, NULL, &pTextureView);
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	static bool bShowMenu = true;
