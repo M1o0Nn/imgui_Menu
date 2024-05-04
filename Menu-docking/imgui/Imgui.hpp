@@ -11,7 +11,8 @@
 #include <d3dx11.h>
 #pragma comment(lib,"d3dx11.lib")
 
-#include "fonts/IconFont.hpp"
+#include "other/IconFont.hpp"
+#include "other/HitBoxex.h"
 
 #include "myImgui.hpp"
 
@@ -66,40 +67,178 @@ void SetStyle()
 	colors[ImGuiCol_Button] = ImVec4(0.09f, 0.09f, 0.09f, 1.00f);
 	colors[ImGuiCol_ButtonHovered] = ImVec4(0.11f, 0.11f, 0.11f, 1.00f);
 	colors[ImGuiCol_ButtonActive] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
-
-	colors[ImGuiCol_ChildBg] = ImVec4(0.04f, 0.04f, 0.05f, 1.00f); //ImVec4(0.04f, 0.05f, 0.05f, 1.00f); 
 	
-
 	ImGui::GetStyle().ItemSpacing = { 0.f, 0.f };
 	ImGui::GetStyle().WindowPadding = { 0.f, 0.f };
 
 }
 using namespace ImGui;
 
+void Legitbot(ImVec2& cursorpos)
+{
+	myBeginChild("Aimbot", ImVec2(230, 300), &config::legitbot::aim_enable);
+	{
+		if (config::legitbot::aim_enable)
+		{
+			static float aa = 15.5;
+			AddSliderFloat("Hipfire distance", &config::legitbot::aim_hip_dis, 0, 100, "%.0f");
+			AddSliderFloat("Zoom distance", &config::legitbot::aim_zoom_dis, 0, 300, "%.0f");
+			AddHotkey("Aim key", &config::legitbot::aim_key_1);
+			AddHotkey("Extra key", &config::legitbot::aim_key_2);
+		}
+		
+	}
+	myEndChild();
+
+	ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 60 });
+	myBeginChild("Tigerbot", ImVec2(230, 200), &config::legitbot::tig_enable);
+	{
+		if (config::legitbot::tig_enable)
+		{
+			AddSliderFloat("Distance", &config::legitbot::tig_dis, 0, 100, "%.0f");
+			AddHotkey("Tiger key", &config::legitbot::tig_key);
+		}
+	}
+	myEndChild();
+
+	ImGui::SetCursorPos({ cursorpos.x + 10, cursorpos.y + 370 });
+	myBeginChild("Hiebox", ImVec2(230, 200));
+	{
+		AddCheckBox("Advanced", &config::legitbot::hitbox_adv);
+		if (!config::legitbot::hitbox_adv)
+		{
+			const char* HitBoneIndex[] = { "Head", "Neck", "UpperChest","LowerChest","Stomach","Hip","Auto" };
+			AddCombo("Hitbone", &config::legitbot::hitbox_idx, HitBoneIndex, IM_ARRAYSIZE(HitBoneIndex), 125);
+		}
+	}
+	myEndChild();
+
+	ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 270 });
+	myBeginChild("Recoilbot", ImVec2(230, 100), &config::legitbot::rec_enable);
+	{
+		if(config::legitbot::rec_enable)
+		{
+			AddSliderFloat("Recoil X", &config::legitbot::recoil_x, 0, 1, "%.2f");
+			AddSliderFloat("Recoil Y", &config::legitbot::recoil_y, 0, 1, "%.2f");
+		}
+	}
+	myEndChild();
+}
+
+void Visual(ImVec2& cursorpos)
+{
+	myBeginChild("Glow", { 230,520 });
+	{
+
+	}
+	myEndChild();
+
+	ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 60 });
+	myBeginChild("Overlap", { 230,520 });
+	{
+
+	}
+	myEndChild();
+}
+
+void Misc(ImVec2& cursorpos)
+{
+	myBeginChild("Setting", { 230,520 });
+	{
+
+	}
+	myEndChild();
+
+	ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 60 });
+	myBeginChild("Menu", { 230,520 });
+	{
+		AddColorEdit3("Theme color", config::menu_color::theme_col);
+		AddColorEdit3("Begin title color", config::menu_color::begin_title_col);
+		AddColorEdit3("Begin back color", config::menu_color::begin_bgcol);
+		AddColorEdit3("Titlebar back color", config::menu_color::begin_left_bgcol);
+		AddColorEdit3("Main back color", config::menu_color::begin_right_bgcol);
+	}
+	myEndChild();
+}
+
+void Config(ImVec2& cursorpos)
+{
+	auto ZhanW = [](ImVec2 tmp1, ImVec2 tmp2){ImGui::SetCursorPos(ImVec2(tmp1.x + tmp2.x, tmp1.y + tmp2.y)); };
+	myBeginChild("Config list", { 230,520 });
+	{
+
+	}
+	myEndChild();
+
+	ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 60 });
+	myBeginChild("Config setting", { 230,520 });
+	{
+		ZhanW(ImGui::GetCursorPos(), { 10.f,15.f });
+		AddIconButton(ICON_SAVE,"Save", ICON_SAVE " Save",IM_COL32(255, 255, 255, 255), []() {
+			// 保存参数
+			});
+
+		ZhanW(ImGui::GetCursorPos(), { 10.f,15.f });
+		AddIconButton(ICON_FILE, "Load", ICON_FILE " Load", IM_COL32(255, 255, 255, 255), []() {
+			// 保存参数
+			});
+
+		ZhanW(ImGui::GetCursorPos(), { 10.f,15.f });
+		AddIconButton(ICON_FOLD, "Open config folder", ICON_FOLD " Open config folder", IM_COL32(255, 255, 255, 255), []() {
+			// 保存参数
+			});
+	}
+	myEndChild();
+}
+
+void Hitboxex(ImVec2& mainBeginSize)
+{
+	static float current_states_hitboxex_x{};
+	current_states_hitboxex_x = Lerp(current_states_hitboxex_x, config::legitbot::hitbox_adv ? 340.f : 0.f, 0.1f);
+	ImGui::PushFont(big_font);
+	if (current_states_hitboxex_x > 32.000000001f)
+	{
+		ImGui::SetNextWindowSize(ImVec2(current_states_hitboxex_x, 600.f));
+		ImGui::SetNextWindowPos(ImVec2(mainBeginSize.x + 673, mainBeginSize.y));
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(30, 30, 30, 255));
+		ImGui::Begin("test", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
+		{
+			const char* HitBoneChar[] = { "Head", "Neck", "UpperChest", "LowerChest", "Stomach", "Hip" };
+			const ImVec2 HitBoneVec2[] = { ImVec2(172.f,100.f), ImVec2(172.f,140.f), ImVec2(172.f,182.f), ImVec2(172.f,222.f), ImVec2(172.f,265.f), ImVec2(172.f,310.f) };
+			static bool HitBoneBool[6] = {  };
+			AddHitBoxex(HitBoneChar, HitBoneVec2, HitBoneBool, IM_ARRAYSIZE(HitBoneChar));
+		}
+		ImGui::End();
+		ImGui::PopStyleColor();
+	}
+	ImGui::PopFont();
+}
+
 void Menu()
 {
 	// 菜单绘制
 	//ImGui::ShowDemoWindow();
 
-	static ImVec2 WindSize = ImVec2(679, 600);
-	static const char* LogoTitle = "   CLOUD   ";
+	//static ImVec2 WindSize = ImVec2(679, 600);
+	//static const char* LogoTitle = "   CLOUD   ";
+	static ImVec2 WindSize = ImVec2(670, 600);
+	static const char* LogoTitle = "PARTICLE";
 	ImGui::PushFont(logo_font);
 	static auto LogoTextSize = ImGui::CalcTextSize(LogoTitle);
 	static auto LeftWid = LogoTextSize.x + 30;
 	ImGui::PopFont();
-	static bool bIsHitbox = false;
 
 	ImGui::SetNextWindowSize(WindSize);
 	ImGui::Begin("main", (bool*)0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
 	{
 		static int PageIdx = 0;
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.04f, 0.05f, 0.05f, 1.00f));
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(config::menu_color::begin_left_bgcol[0], config::menu_color::begin_left_bgcol[1], config::menu_color::begin_left_bgcol[2], 1.00f));
 		ImGui::BeginChild("Left", { LeftWid,WindSize.y },ImGuiChildFlags_AlwaysAutoResize);
 		ImGui::PopStyleColor();
 		{
 			ImGui::PushFont(logo_font);
 			ImGui::SetCursorPos({ 15.f,20.f });
-			AddLogoTitle(LogoTitle, IM_COL32(MenuColor[0], MenuColor[1], MenuColor[2], 200));
+			AddLogoTitle(LogoTitle, ImGui::ColorConvertFloat4ToU32(ImVec4(config::menu_color::theme_col[0], config::menu_color::theme_col[1], config::menu_color::theme_col[2], 0.8f)));
 			ImGui::PopFont();
 
 			{
@@ -111,15 +250,17 @@ void Menu()
 		ImGui::EndChild();
 
 		ImGui::SetCursorPos({ LeftWid,0 });
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(config::menu_color::begin_right_bgcol[0], config::menu_color::begin_right_bgcol[1], config::menu_color::begin_right_bgcol[2], 1.00f));
 		ImGui::BeginChild("Right", { WindSize.x - LeftWid,WindSize.y });
+		ImGui::PopStyleColor();
 		{
-			auto cursorpos = ImGui::GetCursorPos();
+			ImVec2 cursorpos = ImGui::GetCursorPos();
 			//ImGui::PushStyleColor(ImGuiColor)
 			ImGui::SetCursorPos({ cursorpos.x + 17.f, cursorpos.y + 12 });
 			AddIconButton(ICON_SAVE, "Save Config", ICON_SAVE " Save Config", IM_COL32(100, 100, 100, 255), []() {
 				// 保存参数
 				});
-			//ImGui::Button(ICON_SAVE " Save Config");
+
 			ImGui::SetCursorPos({ cursorpos.x, cursorpos.y + 50 });
 			ImGui::Separator();
 
@@ -127,62 +268,17 @@ void Menu()
 			switch (PageIdx)
 			{
 			case 0:
-			{
-				myBeginChild("Aimbot", ImVec2(230, 300), IM_COL32(109, 193, 20, 0));
-				{
-					static float aa = 15.5;
-					AddSliderFloat("Eitle", &aa, 0, 100, "%.1f");
-					static float col[3]{ .46f, .24f, .87f };
-					AddColorEdit3("Eisible color", col);
-					MenuColor[0] = col[0] * 255.f;
-					MenuColor[1] = col[1] * 255.f;
-					MenuColor[2] = col[2] * 255.f;
-					static bool enable = true;
-					static bool enable1 = false;
-					//ImGui::Checkbox("Enable", &enable);
-					AddCheckBox("Enable", &enable);
-					static int Hitbone = 0;
-					const char* HitBoneIndex[] = { "Head", "Neck", "UpperChest","LowerChest","Stomach","Hip","Auto" };
-					AddCombo("Eitbone", &Hitbone, HitBoneIndex, IM_ARRAYSIZE(HitBoneIndex), 125);
-					AddCheckBox("Enable1", &enable1);
-					static SIZE_T key = 0;
-					ImGui::HotKeyButton(&key, ImVec2(100, 20));
-				}
-				myEndChild();
-
-				ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 60 });
-				myBeginChild("Tigerbot", ImVec2(230, 200), IM_COL32(0, 255, 255, 0));
-				{
-					static float aa = 15.5;
-					AddSliderFloat("Title", &aa, 0, 100);
-				}
-				myEndChild();
-
-				ImGui::SetCursorPos({ cursorpos.x + 10, cursorpos.y + 370 });
-				myBeginChild("Other", ImVec2(230, 200), IM_COL32(0, 255, 255, 0));
-				{
-					AddCheckBox("Hitboxex", &bIsHitbox);
-				}
-				myEndChild();
-
-				ImGui::SetCursorPos({ cursorpos.x + 250, cursorpos.y + 270 });
-				myBeginChild("test", ImVec2(230, 300), IM_COL32(0, 255, 255, 0));
-
-				myEndChild();
-			}
-			break;
+				Legitbot(cursorpos);
+				break;
 			case 1:
-			{
-
-			}
+				Visual(cursorpos);
+				break;
 			case 2:
-			{
-
-			}
+				Misc(cursorpos);
+				break;
 			case 3:
-			{
-
-			}
+				Config(cursorpos);
+				break;
 			break;
 			break;
 			break;
@@ -196,23 +292,7 @@ void Menu()
 	auto mainBeginSize = ImGui::GetWindowPos();
 	ImGui::End();
 
-	static float current_states_hitboxex_x{};
-	current_states_hitboxex_x = Lerp(current_states_hitboxex_x, bIsHitbox ? 340.f : 0.f, 0.1f);
-	ImGui::PushFont(big_font);
-	if (current_states_hitboxex_x > 32.000000001f)
-	{
-		ImGui::SetNextWindowSize(ImVec2(current_states_hitboxex_x, 600.f));
-		ImGui::SetNextWindowPos(ImVec2(mainBeginSize.x + 680, mainBeginSize.y));
-		ImGui::Begin("test", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
-		{
-			const char* HitBoneChar[] = { "Head", "Neck", "UpperChest", "LowerChest", "Stomach", "Hip" };
-			const ImVec2 HitBoneVec2[] = { ImVec2(172.f,100.f), ImVec2(172.f,140.f), ImVec2(172.f,182.f), ImVec2(172.f,222.f), ImVec2(172.f,265.f), ImVec2(172.f,310.f) };
-			static bool HitBoneBool[6] = {  };
-			AddHitBoxex(HitBoneChar, HitBoneVec2, HitBoneBool, IM_ARRAYSIZE(HitBoneChar));
-		}
-		ImGui::End();
-	}
-	ImGui::PopFont();
+	Hitboxex(mainBeginSize);
 }
 
 int CreateWnd(HINSTANCE hInst, bool* bEnalbe, HWND hGamehWnd = nullptr)
@@ -328,7 +408,7 @@ int CreateWnd(HINSTANCE hInst, bool* bEnalbe, HWND hGamehWnd = nullptr)
 	ImGui_ImplDX11_Init(device, device_context);
 
 	ID3D11Resource* resource;
-	D3DX11CreateTextureFromFile(device, L"test.png", NULL, NULL, &resource, NULL);
+	D3DX11CreateTextureFromMemory(device, HitBoxex, HitBoxex_size, NULL, NULL, &resource, NULL);
 	device->CreateShaderResourceView(resource, NULL, &pTextureView);
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
